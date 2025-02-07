@@ -37,8 +37,16 @@ marcas_populares = df['Marca'].value_counts().head(10)     # 10 marcas más frec
 print("Marcas más populares:\n", marcas_populares)
 
 plt.figure(figsize=(10, 6))                                # Tamaño del gráfico
-marcas_populares.plot(kind='bar', color='skyblue')         # Gráfico de Barras Vertical
-plt.title('Marcas Más Populares', fontsize=16)             # Título del gráfico
+sns.barplot(                                               # Gráfico de Barras Vertical
+    x=marcas_populares.index,                              
+    y=marcas_populares.values,                             
+    palette='Blues'                                        # Paleta de Colores
+    )  
+plt.title(                                                 # Título del gráfico
+    'Marcas Más Populares', 
+    fontsize=16, 
+    weight='bold'
+    )
 plt.xlabel('Marca', fontsize=12)                           # Etiqueta del eje X
 plt.ylabel('Cantidad de Publicaciones', fontsize=12)       # Etiqueta del eje Y
 plt.xticks(rotation=45, ha='right')                        # Etiquetas del eje X, rotadas 45 grados, alineadas a la derecha
@@ -52,7 +60,11 @@ print("Productos más populares:\n", productos_populares)
 
 plt.figure(figsize=(10, 6))                                              # Tamaño del gráfico
 productos_populares.plot(kind='barh', color='lightcoral')                # Gráfico de Barras Horizontal
-plt.title('Productos Más Populares', fontsize=16)                        # Título del gráfico
+plt.title(                                                               # Título del gráfico
+    'Productos Más Populares', 
+    fontsize=16, 
+    weight='bold'
+    ) 
 plt.xlabel('Cantidad de Ventas', fontsize=12)                            # Etiqueta del eje X
 plt.ylabel('Producto', fontsize=12)                                      # Etiqueta del eje Y
 plt.tight_layout()                                                       # Ajusta márgenes
