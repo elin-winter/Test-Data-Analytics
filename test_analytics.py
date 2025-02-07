@@ -4,7 +4,8 @@ import pandas as pd                          # Manejar datos en forma de tablas
 import matplotlib.pyplot as plt              # Hacer gráficos
 import seaborn as sns                        # Gráficos más facheros
 from fpdf import FPDF
-import xlsxwriter
+import os 
+from datetime import datetime
 
 # ---------------------------- AJUSTES INICIALES
 
@@ -470,128 +471,63 @@ plt.savefig(                                                         # Guardar e
 
 plt.close()
 
-# ---------------------------- CREAR REPORTE EXCEL
-
-with pd.ExcelWriter('reporte_ventas.xlsx', engine='xlsxwriter') as writer:
-    # Exportar los DataFrames a hojas de Excel
-    df.describe().to_excel(writer, sheet_name='Estadísticas')
-    marcas_populares.to_frame().to_excel(writer, sheet_name='Marcas Populares')
-    productos_populares.to_frame().to_excel(writer, sheet_name='Productos Populares')
-    df[['Fecha', 'Precio Original']].dropna().to_excel(writer, sheet_name='Variación de Precios')
-
-    # Obtener el objeto workbook y configurar formato
-    workbook = writer.book
-    bold_format = workbook.add_format({'bold': True, 'font_size': 12, 'bg_color': '#F4CCCC', 'border': 1, 'align': 'center', 'valign': 'vcenter'})
-    header_format = workbook.add_format({'bold': True, 'bg_color': '#FFDDC1', 'border': 1, 'align': 'center', 'valign': 'vcenter'})
-    data_format = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
-    image_format = workbook.add_format({'border': 0, 'align': 'center'})
-
-    # Agregar gráficos al Excel
-    worksheet = writer.sheets['Estadísticas']
-    worksheet.insert_image('E2', 'marcas_populares.png', {'x_scale': 0.5, 'y_scale': 0.5})  # Ajuste de escala para que el gráfico se vea más pequeño
-    worksheet.insert_image('E20', 'productos_populares.png', {'x_scale': 0.5, 'y_scale': 0.5})
-    worksheet.insert_image('E40', 'promedio_productos.png', {'x_scale': 0.5, 'y_scale': 0.5})
-    # worksheet.insert_image('E60', 'variacion_precios.png', {'x_scale': 0.5, 'y_scale': 0.5})
-    worksheet.insert_image('E80', 'prediccion_ventas_mejorado.png', {'x_scale': 0.5, 'y_scale': 0.5})
-    worksheet.insert_image('E100', 'ventas_mensuales.png', {'x_scale': 0.5, 'y_scale': 0.5})
-    worksheet.insert_image('E120', 'impacto_ofertas.png', {'x_scale': 0.5, 'y_scale': 0.5})
-    worksheet.insert_image('E140', 'matriz_correlaciones.png', {'x_scale': 0.5, 'y_scale': 0.5})
-
-    # Ajustes de formato en la hoja de "Estadísticas"
-    worksheet.set_column('A:B', 20, data_format)
-    worksheet.set_column('C:C', 15, data_format)
-    worksheet.write(0, 0, 'Estadísticas Generales', bold_format)
-    worksheet.write(1, 0, 'Descripción', header_format)
-    worksheet.write(1, 1, 'Valor', header_format)
-
-    # Añadir formato a la hoja "Marcas Populares"
-    worksheet = writer.sheets['Marcas Populares']
-    worksheet.set_column('A:B', 30, data_format)
-    worksheet.write(0, 0, 'Marca', header_format)
-    worksheet.write(0, 1, 'Número de Productos', header_format)
-
-    # Añadir formato a la hoja "Productos Populares"
-    worksheet = writer.sheets['Productos Populares']
-    worksheet.set_column('A:B', 30, data_format)
-    worksheet.write(0, 0, 'Producto', header_format)
-    worksheet.write(0, 1, 'Número de Ventas', header_format)
-
-    # Ajustar los anchos de las columnas según el contenido
-    for sheet in writer.sheets.values():
-        for col_num, col in enumerate(sheet.columns):
-            max_length = 0
-            column = col
-            for cell in column:
-                try:
-                    if len(str(cell)) > max_length:
-                        max_length = len(cell)
-                except:
-                    pass
-            adjusted_width = (max_length + 2)
-            sheet.set_column(col_num, col_num, adjusted_width, data_format)
-
-    # Personalización adicional de la apariencia
-    worksheet = writer.sheets['Estadísticas']
-    worksheet.set_row(0, 25, bold_format)  # Hacer la primera fila más alta para títulos
-    worksheet.set_row(1, 20, data_format)  # Asegurarse que las filas tengan el mismo tamaño
-
-    # Para las hojas de 'Marcas Populares', 'Productos Populares' y 'Variación de Precios'
-    for sheet_name in ['Marcas Populares', 'Productos Populares']:
-        worksheet = writer.sheets[sheet_name]
-        worksheet.set_row(0, 20, bold_format)  # Ajuste de la altura de la primera fila
-
-    # Añadir bordes a las celdas de datos
-    for sheet_name in writer.sheets:
-        worksheet = writer.sheets[sheet_name]
-        worksheet.conditional_format('A1:Z1000', {'type': 'no_blanks', 'format': workbook.add_format({'border': 1})})
-
-
 # ---------------------------- CREAR REPORTE PDF
 class PDF(FPDF):
     def header(self):
+        # Logo
+        if os.path.exists('logo.jpeg'):
+            self.image('logo.jpeg', 10, 8, 25)
         self.set_font('Arial', 'B', 14)
         self.cell(0, 10, 'Reporte de Ventas', ln=True, align='C')
         self.ln(10)
-    
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.cell(0, 10, f'Página {self.page_no()} - {datetime.today().strftime("%Y-%m-%d")}', align='C')
+
     def chapter_title(self, title):
         self.set_font('Arial', 'B', 12)
         self.cell(0, 10, title, ln=True, align='L')
         self.ln(5)
-    
+
     def chapter_body(self, body):
         self.set_font('Arial', '', 10)
         self.multi_cell(0, 7, body)
         self.ln()
 
+    def add_image(self, image_path):
+        if os.path.exists(image_path):
+            self.image(image_path, x=10, w=180)
+        else:
+            self.set_font('Arial', 'I', 10)
+            self.cell(0, 10, f'Imagen no encontrada: {image_path}', ln=True, align='L')
+        self.ln(5)
+
+# Crear documento
 pdf = PDF()
 pdf.set_auto_page_break(auto=True, margin=15)
 pdf.add_page()
-pdf.chapter_title('Resumen Ejecutivo')
-pdf.chapter_body('Este informe presenta un análisis detallado de las ventas, las marcas más populares y la evolución de las ventas en el tiempo.')
 
-pdf.chapter_title('Marcas Más Populares')
-pdf.image('marcas_populares.png', x=10, w=180)
+# Secciones
+data = [
+    ("Resumen Ejecutivo", "Este informe presenta un análisis detallado de las ventas, las marcas más populares y la evolución de las ventas en el tiempo."),
+    ("Marcas Más Populares", "marcas_populares.png"),
+    ("Productos Más Populares", "productos_populares.png"),
+    ("Evolución de Ventas Mensuales", "ventas_mensuales.png"),
+    ("Promedio de Productos Comprados por Marca", "promedio_productos.png"),
+    ("Predicción de Ventas", "prediccion_ventas_mejorado.png"),
+    ("Impacto de Ofertas", "impacto_ofertas.png"),
+    ("Matriz de Correlaciones", "matriz_correlaciones.png")
+]
 
-pdf.chapter_title('Productos Más Populares')
-pdf.image('productos_populares.png', x=10, w=180)
+for title, content in data:
+    pdf.chapter_title(title)
+    if isinstance(content, str) and content.endswith('.png'):
+        pdf.add_image(content)
+    else:
+        pdf.chapter_body(content)
 
-pdf.chapter_title('Evolución de Ventas Mensuales')
-pdf.image('ventas_mensuales.png', x=10, w=180)
-
-pdf.chapter_title('Promedio de Productos Comprados por Marca')
-pdf.image('promedio_producto.png', x=10, w=180)
-
-pdf.chapter_title('Predicción de Ventas')
-pdf.image('prediccion_ventas_mejorado.png', x=10, w=180)
-
-pdf.chapter_title('Variación de Precios')
-pdf.image('variacion_precios.png', x=10, w=180)
-
-pdf.chapter_title('Impacto de Ofertas')
-pdf.image('impacto_ofertas.png', x=10, w=180)
-
-pdf.chapter_title('Matriz de Correlaciones')
-pdf.image('matriz_correlaciones.png', x=10, w=180)
-
+# Guardar PDF
 pdf.output('reporte_ventas.pdf')
-print("Reporte generado con éxito: Excel y PDF guardados.")
+print("Reporte generado con éxito: PDF guardado.")
