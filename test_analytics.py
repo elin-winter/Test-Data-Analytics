@@ -18,14 +18,24 @@ df['Precio Original'] = pd.to_numeric(df['Precio Original'], errors='coerce')
 df['Precio Usd'] = pd.to_numeric(df['Precio Usd'], errors='coerce')
 df['Monto Vendido USD'] = pd.to_numeric(df['Monto Vendido USD'], errors='coerce')
 
-# Inspección inicial de los datos
-print(df.info())                                    # Info sobre columnas y tipos de datos
-print(df.describe())                                # Estadísticas básicas de columnas numéricas
+# ---------------------------- INFORMES
+
+# Información del DataFrame
+print("\nInformación del DataFrame:")
+print(df.info())                         # Info sobre columnas y tipos de datos
+
+# Estadísticas descriptivas
+print("\nEstadísticas Descriptivas:")
+print(df.describe().round(2))            # Estadísticas básicas de columnas numéricas
+
 
 # ---------------------------- ANALISIS
 
 # ----- Marcas más populares
-marcas_populares = df['Marca'].value_counts().head(10)     # Cuenta cuántas veces aparece cada marca
+
+marcas_populares = df['Marca'].value_counts().head(10)     # 10 marcas más frecuentes en el dataset
+print("Marcas más populares:\n", marcas_populares)
+
 plt.figure(figsize=(10, 6))                                # Tamaño del gráfico
 marcas_populares.plot(kind='bar', color='skyblue')         # Gráfico de Barras Vertical
 plt.title('Marcas Más Populares', fontsize=16)             # Título del gráfico
@@ -37,7 +47,9 @@ plt.show()
 
 # ----- Productos más populares
 
-productos_populares = df['Titulo Publicacion'].value_counts().head(10)   # Cuenta cuántas veces aparece cada producto
+productos_populares = df['Titulo Publicacion'].value_counts().head(10)   # 10 productos más frecuentes en el dataset
+print("Productos más populares:\n", productos_populares)
+
 plt.figure(figsize=(10, 6))                                              # Tamaño del gráfico
 productos_populares.plot(kind='barh', color='lightcoral')                # Gráfico de Barras Horizontal
 plt.title('Productos Más Populares', fontsize=16)                        # Título del gráfico
@@ -49,6 +61,15 @@ plt.show()
 # ----- Promedio de productos comprados por marca
 productos_por_marca = df.groupby('Marca')['Unidades Vendidas'].mean().sort_values(ascending=False)
 print("Promedio de productos comprados por marca:\n", productos_por_marca)
+
+plt.figure(figsize=(10, 6))                                              # Tamaño del gráfico
+productos_por_marca.plot(kind='bar', color='lightgreen')                 # Gráfico de Barras Vertical
+plt.title('Promedio de Productos Comprados por Marca', fontsize=16)      # Título del gráfico
+plt.xlabel('Marca', fontsize=12)                                         # Etiqueta del eje X
+plt.ylabel('Promedio de Unidades Vendidas', fontsize=12)                 # Etiqueta del eje Y
+plt.xticks(rotation=45, ha='right')                                      # Etiquetas del eje X, rotadas 45 grados, alineadas a la derecha
+plt.tight_layout()                                                       # Ajusta márgenes 
+plt.show()
 
 # ----- Gráfico de ventas mensuales
 
@@ -118,38 +139,8 @@ plt.xlabel("Fecha")                                                   # Etiqueta
 plt.ylabel("Unidades Vendidas")                                       # Etiqueta del eje Y (Ventas)
 plt.show()                                                            # Muestra el gráfico
 
-
-
-
-
-
-
-
-# -----------------------------------ç
-
-
-
-
-
-
-# Promedio de productos comprados por marca
-promedio_por_marca = df.groupby('Marca')['Unidades Vendidas'].mean().sort_values(ascending=False).head(10)
-plt.figure(figsize=(10, 6))
-promedio_por_marca.plot(kind='bar', color='lightgreen')
-plt.title('Promedio de Productos Comprados por Marca', fontsize=16)
-plt.xlabel('Marca', fontsize=12)
-plt.ylabel('Promedio de Unidades Vendidas', fontsize=12)
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-plt.show()
-
-# Estadísticas descriptivas
-print("\nEstadísticas Descriptivas:")
-print(df.describe().round(2))
-
-# Si quieres guardar el reporte en un archivo, puedes usar pandas para crear un archivo Excel:
 with pd.ExcelWriter('reporte_ventas.xlsx') as writer:
     marcas_populares.to_frame().to_excel(writer, sheet_name='Marcas Populares')
     productos_populares.to_frame().to_excel(writer, sheet_name='Productos Populares')
-    promedio_por_marca.to_frame().to_excel(writer, sheet_name='Promedio por Marca')
+    productos_por_marca.to_frame().to_excel(writer, sheet_name='Promedio por Marca')
     df.describe().round(2).to_excel(writer, sheet_name='Estadísticas Descriptivas')
