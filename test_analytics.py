@@ -78,7 +78,8 @@ plt.savefig(                                    # Guardar el gráfico en una ima
     'marcas_populares.png', 
     dpi=300                                     # Aumentar resolución
     )
-plt.close()
+plt.show()
+# plt.close()
 
 # ----- Productos más populares
 
@@ -130,7 +131,8 @@ plt.savefig(                                    # Guardar el gráfico en una ima
     'productos_populares.png', 
     dpi=300                                     # Aumentar resolución
     )  
-plt.close()
+plt.show()
+# plt.close()
 
 
 # ----- Promedio de productos comprados por marca
@@ -190,7 +192,8 @@ plt.savefig(                                    # Guardar el gráfico en una ima
     'promedio_productos.png', 
     dpi=300                                     # Aumentar resolución
     )  
-plt.close()
+plt.show()
+# plt.close()
 
 
 # ----- Gráfico de ventas mensuales
@@ -245,12 +248,13 @@ plt.grid(                                       # Grid ligero
     alpha=0.7
     )
 plt.tight_layout(pad=2)                         # Ajustar márgenes y agregar espacio extra
-plt.gcf().set_facecolor('#EEEEEE')           # Fondo del gráfico
+plt.gcf().set_facecolor('#EEEEEE')              # Fondo del gráfico
 plt.savefig(                                    # Guardar el gráfico en una imagen
     'ventas_mensuales.png', 
     dpi=300                                     # Aumentar resolución
     )  
-plt.close()
+plt.show()
+# plt.close()
 
 # ----- Análisis de la inflación en los precios
 
@@ -300,7 +304,8 @@ plt.grid(
     )
 plt.tight_layout()
 plt.savefig('variacion_precio.png', dpi=300)
-plt.close()
+plt.show()
+# plt.close()
 
 # ----- Comparación de ventas entre productos nuevos y usados
 ventas_estado = df.groupby('Estado')['Unidades Vendidas'].sum()
@@ -342,7 +347,8 @@ plt.savefig(                                                         # Guardar e
     'ventas_estado.png', 
     dpi=300)
 
-plt.close()
+plt.show()
+# plt.close()
 
 # ----- Análisis del impacto de las ofertas
 ventas_oferta = df.groupby('Esta en Oferta')['Unidades Vendidas'].mean()  
@@ -383,93 +389,5 @@ plt.savefig(                                                         # Guardar e
     'impacto_ofertas.png', 
     dpi=300)
 
-plt.close()
-
-# ----- Matriz de correlaciones para analizar relaciones entre variables
-plt.figure(figsize=(10,6))                                           # Tamaño del gráfico
-
-sns.heatmap(                                                         # Mapa de calor 
-    df.corr(numeric_only=True),                                      # Correlación entre variables numéricas
-    annot=True,                                                      # Valores numéricos dentro del gráfico
-    cmap='coolwarm',                                                 # Esquema de colores (positivos, rojos) y (negativos, azules)
-    fmt=".2f",                                                       # Números dentro del mapa con 2 decimales 
-    cbar_kws={'label': 'Correlación'},                               # Etiqueta para la barra de color
-    annot_kws={'size': 12, 'weight': 'bold', 'color': 'black'},      # Tamaño, peso y color del texto en las celdas
-    linewidths=1,                                                    # Grosor de las líneas de las celdas
-    linecolor='#7886C7',                                                # Color de las líneas de separación
-    vmin=-1, vmax=1                                                  # Rango de la barra de color
-    )  
-                                                     
-plt.title(                                                           # Título del gráfico
-    'Matriz de Correlaciones entre Variables', 
-    fontsize=20, 
-    fontweight='bold', 
-    color='#2D336B'
-    )
-
-plt.gcf().set_facecolor('#EEEEEE')                                   # Fondo del gráfico
-
-plt.tight_layout()                                                   # Ajustar márgenes
-
-plt.savefig(                                                         # Guardar el gráfico en una imagen
-    'matriz_correlaciones.png', 
-    dpi=300
-    )
-
-plt.close()
-
-# ----- Comparación: ventas reales y predicción
-# Se calcula un promedio de las ventas de los últimos 3 meses
-df['Ventas Promedio Móvil'] = df['Unidades Vendidas'].rolling(window=3).mean()  
-
-plt.figure(figsize=(12,6))                                            # Tamaño del gráfico
-
-sns.lineplot(                                                         # Graficar las ventas reales
-    data=df, x='Fecha', y='Unidades Vendidas',
-    label="Ventas Reales", color='#2D336B', linewidth=1.5, alpha=0.3
-)
-
-sns.lineplot(                                                         # Graficar la predicción
-    data=df, x='Fecha', y='Ventas Promedio Móvil',
-    label="Predicción (Prom. Móvil)", color='#FBA518', linestyle='dashed', linewidth=2
-)
-
-plt.title(                                                            # Título del gráfico
-    "Comparación de Ventas: Predicción vs Realidad",
-    fontsize=20, 
-    fontweight='bold', 
-    color='#2D336B'
-)
-
-plt.xlabel(                                                           # Etiqueta del Eje X
-    "Fecha", 
-    fontsize=15, 
-    fontweight='bold', 
-    color='#7886C7'
-    )
-
-plt.ylabel(                                                           # Etiqueta del Eje Y
-    "Unidades Vendidas", 
-    fontsize=12, 
-    fontweight='bold', 
-    color='#7886C7'
-    )
-
-plt.xticks(rotation=45)
-
-plt.legend(
-    frameon=True, 
-    fontsize=12, 
-    loc="upper left"
-    )
-
-plt.gcf().set_facecolor('#EEEEEE')                                   # Fondo del gráfico
-
-plt.tight_layout()                                                   # Ajustar márgenes
-
-plt.savefig(                                                         # Guardar el gráfico en una imagen
-    'prediccion_ventas_mejorado.png', 
-    dpi=300
-    )
-
-plt.close()
+plt.show()
+# plt.close()
